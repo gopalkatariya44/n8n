@@ -1,7 +1,7 @@
 import * as fflate from 'fflate';
-import { readFile, readdir, writeFile, mkdir } from 'fs/promises';
+import { readFile, readdir, mkdir } from 'fs/promises';
 import * as path from 'path';
-import { createWriteStream } from 'fs';
+import { createWriteStream, createReadStream, mkdirSync } from 'fs';
 import { safeJoinPath } from '@n8n/backend-common';
 
 // Reuse the same compression levels as the Compression node
@@ -115,32 +115,72 @@ export async function compressFolder(
 }
 
 /**
- * Decompress a ZIP archive to a folder
+ * Decompress a ZIP archive to a folder using streaming.
+ * Uses UnzipInflate (synchronous, no worker threads) and pipes each file's
+ * decompressed chunks directly to a write stream to keep memory usage low.
  */
 export async function decompressFolder(sourcePath: string, outputDir: string): Promise<void> {
 	await mkdir(outputDir, { recursive: true });
 
-	const zipData = new Uint8Array(await readFile(sourcePath));
-
 	return new Promise<void>((resolve, reject) => {
-		fflate.unzip(zipData, async (err, files) => {
-			if (err) {
+		let pendingWrites = 0;
+		let streamFinished = false;
+
+		function checkDone() {
+			if (streamFinished && pendingWrites === 0) {
+				resolve();
+			}
+		}
+
+		const unzip = new fflate.Unzip((stream) => {
+			if (stream.name.endsWith('/')) return;
+
+			pendingWrites++;
+			const filePath = sanitizePath(stream.name, outputDir);
+			mkdirSync(path.dirname(filePath), { recursive: true });
+
+			const writeStream = createWriteStream(filePath);
+			writeStream.on('error', reject);
+
+			stream.ondata = (error, chunk, final) => {
+				if (error) {
+					reject(error);
+					return;
+				}
+				writeStream.write(Buffer.from(chunk));
+				if (final) {
+					writeStream.end(() => {
+						pendingWrites--;
+						checkDone();
+					});
+				}
+			};
+
+			stream.start();
+		});
+
+		// UnzipInflate is synchronous (no worker threads), safe in all environments
+		unzip.register(fflate.UnzipInflate);
+
+		const zipStream = createReadStream(sourcePath);
+		zipStream.on('error', reject);
+		zipStream.on('data', (chunk: Buffer) => {
+			try {
+				unzip.push(new Uint8Array(chunk));
+			} catch (err) {
+				reject(err);
+			}
+		});
+		zipStream.on('end', () => {
+			try {
+				// Signal end-of-stream so fflate parses the central directory
+				unzip.push(new Uint8Array(0), true);
+			} catch (err) {
 				reject(err);
 				return;
 			}
-
-			try {
-				for (const [fileName, fileData] of Object.entries(files)) {
-					if (fileName.endsWith('/')) continue;
-
-					const filePath = sanitizePath(fileName, outputDir);
-					await mkdir(path.dirname(filePath), { recursive: true });
-					await writeFile(filePath, Buffer.from(fileData));
-				}
-				resolve();
-			} catch (writeError) {
-				reject(writeError);
-			}
+			streamFinished = true;
+			checkDone();
 		});
 	});
 }
