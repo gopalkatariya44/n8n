@@ -178,11 +178,18 @@ export async function decompressFolder(sourcePath: string, outputDir: string): P
 		// Create readable stream
 		const zipStream = createReadStream(sourcePath);
 
+		zipStream.on('error', reject);
+
+		const chunks: Uint8Array[] = [];
 		for await (const chunk of zipStream) {
-			unzip.push(chunk as Uint8Array);
+			chunks.push(chunk as Uint8Array);
 		}
 
-		zipStream.on('error', reject);
+		// Signal end-of-stream on the last chunk so fflate knows the zip data is complete.
+		// Without final=true, fflate waits for more data and throws "unexpected EOF".
+		for (let i = 0; i < chunks.length; i++) {
+			unzip.push(chunks[i], i === chunks.length - 1);
+		}
 
 		// If no files were processed (e.g., only directories), resolve immediately
 		if (filesToProcess === 0) {
