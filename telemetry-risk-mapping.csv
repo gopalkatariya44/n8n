@@ -1,0 +1,350 @@
+event_name,risk_category,trigger,what_it_implies
+API key created,CRITICAL,Public API key created,Unauthorized user created persistent API access (backdoor)
+API key deleted,CRITICAL,Public API key deleted,Unauthorized user removed API key (covering tracks or denial of service)
+User changed role,CRITICAL,Admin changes user's instance role,Unauthorized user escalated/changed privileges
+User created external secrets connection,CRITICAL,External secrets connection created,Unauthorized user connected a secrets vault
+User deleted credentials,CRITICAL,Credential deleted via API,Unauthorized user destroyed credential data
+User deleted external secrets connection,CRITICAL,External secrets connection deleted,Unauthorized user severed secrets vault connection
+User deleted project,CRITICAL,Team project deleted,Unauthorized user destroyed project and its resources
+User deleted user,CRITICAL,Admin deletes a user,Unauthorized user removed another user account
+User deleted workflow,CRITICAL,Workflow deleted,Unauthorized user destroyed workflow data
+User downloaded version,CRITICAL,Workflow version downloaded from history,Unauthorized user exfiltrated historical workflow data
+User exported workflow,CRITICAL,Workflow JSON exported/downloaded,"Unauthorized user exfiltrated workflow data (may contain credential references, logic, API URLs)"
+User invited new user,CRITICAL,Admin invites new user,Unauthorized user created an invitation (potential persistent access)
+User updated Ldap settings,CRITICAL,Admin changes LDAP config,Unauthorized user changed auth backend config
+User updated external secrets connection,CRITICAL,External secrets connection updated,Unauthorized user modified secrets vault connection
+User updated external secrets settings,CRITICAL,External secrets provider settings saved,Unauthorized user accessed/modified vault credentials
+User updated instance policies,CRITICAL,"Admin changes security settings (2FA enforcement, workflow sharing/publishing)",Unauthorized user weakened security policies
+User updated log streaming destination,CRITICAL,Log streaming destination changed,Unauthorized user could redirect audit logs to attacker-controlled endpoint
+User updated provisioning settings,CRITICAL,SSO user role provisioning changed,Unauthorized user changed how roles are auto-assigned
+User updated single sign on settings,CRITICAL,Admin saves SAML/OIDC settings,"Unauthorized user changed SSO config, potential account takeover vector"
+User updated source control settings,CRITICAL,Source control settings changed,Unauthorized user modified git/source control config (potential code injection)
+Manual node exec finished,HIGH,Manual single-node execution finished,Unauthorized user executed a node with credentials and saw results
+Manual workflow exec finished,HIGH,Manual workflow execution finished,Unauthorized user executed a workflow with credentials and saw results
+User changed AI Usage settings,HIGH,AI data sharing settings changed,Unauthorized user changed data sharing policy
+User changed personal settings,HIGH,User updates profile/password,Unauthorized user changed another user's password or profile
+User clicked create API key button,HIGH,Create API key button clicked,Unauthorized user attempted to create API key
+User clicked delete API key button,HIGH,Delete API key button clicked,Unauthorized user attempted to delete API key
+User clicked execute node button,HIGH,Execute single node clicked,Unauthorized user triggered node execution using bound credentials
+User clicked execute workflow button,HIGH,Execute Workflow clicked,"Unauthorized user triggered workflow execution — if workflow was crafted/modified, this is the exfiltration moment"
+User cloned version,HIGH,Workflow version cloned,Unauthorized user copied historical workflow version
+User copied ndv data,HIGH,Data copied from NDV output,Unauthorized user copied execution/node output data
+User copied webhook URL,HIGH,Webhook URL copied,Unauthorized user obtained webhook endpoint URL
+User created credentials,HIGH,New credential created (backend),Unauthorized user added credentials to the instance
+User created workflow,HIGH,Workflow created,Unauthorized user could create a workflow that uses existing credentials to exfiltrate data to attacker-controlled endpoint
+User invoked API,HIGH,Any public API endpoint called,Unauthorized user accessed the API (path/method logged)
+User opened Executions log,HIGH,Executions log page opened,Unauthorized user viewed execution history (may reveal data flow)
+User opened read-only execution,HIGH,Execution details viewed,Unauthorized user viewed execution data
+User opened workflow history,HIGH,Workflow history panel opened,Unauthorized user browsed historical workflow versions
+User reloaded external secrets,HIGH,External secrets provider reloaded,Unauthorized user triggered secrets refresh
+User restored version,HIGH,Workflow version restored,Unauthorized user restored a previous workflow version
+User retrieved all executions,HIGH,API lists all executions,Unauthorized user enumerated execution history
+User retrieved all users,HIGH,API lists all users,Unauthorized user enumerated all user accounts
+User retrieved all workflows,HIGH,API lists all workflows,Unauthorized user enumerated all workflows
+User retrieved execution,HIGH,API retrieves execution data,Unauthorized user accessed execution results (may contain processed data)
+User retrieved user,HIGH,API retrieves single user,Unauthorized user accessed user profile data
+User retrieved workflow,HIGH,API retrieves single workflow,Unauthorized user accessed workflow definition
+User retrieved workflow version,HIGH,API retrieves workflow version,Unauthorized user accessed historical workflow data
+User saved credentials,HIGH,Credential saved (non-OAuth or OAuth),Unauthorized user modified credential values
+User saved workflow,HIGH,Workflow saved,Unauthorized user could modify existing workflow to exfiltrate credential-bound data
+User set workflow active status,HIGH,Workflow activated/deactivated,Unauthorized user could activate a crafted workflow for persistent exfiltration
+User updated cred sharing,HIGH,Credential sharing changed,Unauthorized user changed who can access credentials
+User updated credentials,HIGH,Credential updated via API,Unauthorized user modified existing credential values
+User updated workflow sharing,HIGH,Workflow sharing changed,Unauthorized user changed workflow access controls
+User viewed worker view,HIGH,Admin views workers/orchestration,Unauthorized user saw infrastructure details
+Project settings updated,MEDIUM,Project settings/members changed,Unauthorized user modified project config
+User added member to project,MEDIUM,Member added to project,Unauthorized user changed project membership
+User added node to workflow canvas,MEDIUM,Node added to canvas,Unauthorized user modified workflow
+User archived workflow,MEDIUM,Workflow archived,Unauthorized user archived a workflow
+User called mcp tool,MEDIUM,MCP tool invoked,Unauthorized user used MCP tools
+User changed member role on project,MEDIUM,Member role changed,Unauthorized user changed project permissions
+User changed project name,MEDIUM,Project renamed,Unauthorized user modified project
+User claimed OpenAI credits,MEDIUM,Free AI credits claimed,Unauthorized user claimed resources
+User clicked debug execution button,MEDIUM,Debug execution clicked,Unauthorized user accessed debug mode
+User clicked execute node button in modal,MEDIUM,Execute node in AI modal clicked,Unauthorized user triggered node execution from AI modal
+User clicked retry execution button,MEDIUM,Execution retry clicked,Unauthorized user re-ran past execution
+User confirmed stop many executions,MEDIUM,Bulk execution stop confirmed,Unauthorized user stopped running executions
+User connected to MCP server,MEDIUM,MCP connection established,Unauthorized user connected via MCP
+User created agent,MEDIUM,Chat agent created,Unauthorized user created AI agent
+User created data table,MEDIUM,Data table created,Unauthorized user created data storage
+User created folder,MEDIUM,Folder created,Unauthorized user modified file structure
+User created project,MEDIUM,Team project created,Unauthorized user created a project
+User created variable,MEDIUM,Variable created,Unauthorized user added instance variable
+User deleted a run,MEDIUM,Test run deleted,Unauthorized user deleted test data
+User deleted data table,MEDIUM,Data table deleted,Unauthorized user destroyed data
+User deleted folder,MEDIUM,Folder deleted,Unauthorized user destroyed organization
+User deleted node,MEDIUM,Node deleted from workflow,Unauthorized user modified workflow structure
+User deleted rows in data table,MEDIUM,Data table rows deleted,Unauthorized user destroyed data
+User deleted variable,MEDIUM,Variable deleted,Unauthorized user deleted instance variable
+User downloaded data table CSV,MEDIUM,Data table exported as CSV,Unauthorized user exfiltrated tabular data
+User duplicated workflow,MEDIUM,Workflow duplicated,Unauthorized user copied a workflow
+User edited data table content,MEDIUM,Data table cell edited,Unauthorized user modified stored data
+User edited workflow tags,MEDIUM,Workflow tags changed,Unauthorized user modified workflow metadata
+User extracted nodes to sub-workflow,MEDIUM,Nodes extracted to sub-workflow,Unauthorized user restructured workflows
+User finished pull via UI,MEDIUM,Source control pull finished,Unauthorized user completed pull from git
+User finished push via UI,MEDIUM,Source control push finished,Unauthorized user completed push to git
+User gave MCP access to workflow,MEDIUM,MCP access granted to workflow,Unauthorized user exposed workflow via MCP
+User imported workflow,MEDIUM,Workflow imported from file,Unauthorized user imported external workflow
+User inserted workflow template,MEDIUM,Template inserted into workflow,Unauthorized user added template content
+User moved content,MEDIUM,Workflow/credential moved between projects,Unauthorized user reorganized resources
+User pasted nodes,MEDIUM,Nodes pasted into canvas,Unauthorized user added nodes via paste
+User published version from canvas,MEDIUM,Workflow version published,Unauthorized user published a workflow version
+User published version from history,MEDIUM,Workflow published from history,Unauthorized user published historical version
+User pulled via API,MEDIUM,Source control pull via API,Unauthorized user pulled via API
+User ran test,MEDIUM,Evaluation test run,Unauthorized user executed evaluation test
+User registered for license community plus,MEDIUM,Community plus registration,Unauthorized user registered for license
+User removed member from project,MEDIUM,Member removed from project,Unauthorized user removed project access
+User renamed folder,MEDIUM,Folder renamed,Unauthorized user modified organization
+User selected sharee to add,MEDIUM,Sharee added to workflow,Unauthorized user expanded workflow access
+User selected sharee to remove,MEDIUM,Sharee removed from workflow,Unauthorized user restricted workflow access
+User sent message in Assistant,MEDIUM,Assistant message sent,Unauthorized user interacted with AI assistant
+User set node enabled status,MEDIUM,Node enabled/disabled,Unauthorized user changed node behavior
+User set workflow description,MEDIUM,Workflow description updated,Unauthorized user modified workflow metadata
+User started pull via UI,MEDIUM,Source control pull started,Unauthorized user pulled changes from git
+User started push via UI,MEDIUM,Source control push started,Unauthorized user pushed changes to git
+User submitted builder message,MEDIUM,Message sent to AI builder,Unauthorized user used AI builder (may expose instance context)
+User successfully created new role,MEDIUM,Custom role created,Unauthorized user created new permission role
+User successfully deleted role,MEDIUM,Custom role deleted,Unauthorized user deleted permission role
+User toggled MCP access,MEDIUM,MCP access toggled,Unauthorized user changed MCP settings
+User unarchived workflow,MEDIUM,Workflow unarchived,Unauthorized user unarchived a workflow
+User unpublished workflow from history,MEDIUM,Workflow unpublished,Unauthorized user deactivated published workflow
+User updated role,MEDIUM,Custom role updated,Unauthorized user modified permissions
+User updated variable,MEDIUM,Variable updated,Unauthorized user modified instance variable
+User updated workflow settings,MEDIUM,Workflow settings saved,Unauthorized user changed workflow config
+Workflow execution with dynamic credentials,MEDIUM,Execution using dynamic credentials,Unauthorized user ran workflow with dynamic creds
+cnr package deleted,MEDIUM,Community node deleted,Unauthorized user removed community node
+cnr package install finished,MEDIUM,Community node installed,Unauthorized user installed arbitrary code
+cnr package updated,MEDIUM,Community node updated,Unauthorized user updated community node
+user started cnr package deletion,MEDIUM,Community node deletion started,Unauthorized user initiated package removal
+user started cnr package install,MEDIUM,Community node install started,Unauthorized user initiated package install
+user started cnr package update,MEDIUM,Community node update started,Unauthorized user initiated package update
+Ai Transform code generation finished,LOW,AI transform code gen completed,AI generated transform
+Ai code generation finished,LOW,AI code gen completed,AI generated code
+App selection completed,LOW,App selection done,User completed selection
+App selection page viewed,LOW,App selection shown,User viewed app selection
+App selection search performed,LOW,App selection searched,User searched apps
+Assistant session started,LOW,AI assistant session began,User opened assistant
+End of response from builder,LOW,Builder response finished,AI builder completed response
+Ndv data pinning failure,LOW,Pin data failed,Pin attempt failed
+Ndv data pinning success,LOW,Data pinned successfully,User pinned test data
+User added data table column,LOW,Data table column added,User modified table
+User added execution annotation tag,LOW,Annotation tag added,User annotated execution
+User added focused param,LOW,Focus param added,User focused on parameter
+User added row to data table,LOW,Data table row added,User added data
+User added workflow input field,LOW,Input field added,User added workflow input
+User attempted to save locked workflow,LOW,Save attempted on locked workflow,User tried to save locked workflow
+User autocompleted code,LOW,Code autocomplete used,User used autocomplete
+User changed ndv branch,LOW,Output branch changed,User browsed output branches
+User changed ndv input dropdown,LOW,Input source changed,User changed input display
+User changed ndv item view,LOW,View mode changed (table/json/schema),User changed data view
+User changed ndv page,LOW,Pagination changed,User browsed data pages
+User changed ndv page size,LOW,Page size changed,User adjusted display
+User changed ndv run dropdown,LOW,Run dropdown changed,User browsed execution runs
+User changed ndv run linking,LOW,Run linking toggled,User changed run display
+User changed template filters,LOW,Template filters changed,User browsed templates
+User changed workflow input field type,LOW,Input field type changed,User changed input type
+User chose input data mode,LOW,Input mode selected,User selected input mode
+User chose sub-workflow,LOW,Sub-workflow selected,User selected sub-workflow
+User clicked add cred button,LOW,Add credential button clicked,User initiated credential creation
+User clicked add custom role from role selector,LOW,Custom role option clicked,User browsed role options
+User clicked add role,LOW,Add role clicked,User browsed roles
+User clicked add variable button,LOW,Add variable clicked,User initiated variable creation
+User clicked add workflow button,LOW,Add workflow button clicked,User initiated workflow creation
+User clicked button on usage page,LOW,Usage page button clicked,User interacted with usage page
+User clicked chat hub suggested prompt,LOW,Suggested prompt clicked,User used suggested prompt
+User clicked chat open button,LOW,Chat pane opened,User opened chat
+User clicked connect workflows from mcp settings,LOW,MCP connect workflows clicked,User browsed MCP settings
+User clicked connected clients tab,LOW,MCP clients tab clicked,User viewed MCP clients
+User clicked create new sub-workflow button,LOW,Create sub-workflow clicked,User initiated sub-workflow
+User clicked credential modal docs link,LOW,Docs link clicked,User opened documentation
+User clicked custom API from node actions,LOW,Custom API clicked,User clicked custom API option
+User clicked delete role,LOW,Delete role clicked,User initiated role deletion
+User clicked empty page option,LOW,Empty page option clicked,User selected option
+User clicked from scratch in empty state,LOW,From scratch clicked,User chose blank canvas
+User clicked header add variable button,LOW,Header add variable clicked,User initiated variable creation
+User clicked help resource,LOW,Help link clicked,User accessed help
+User clicked insights link from side menu,LOW,Insights link clicked,User navigated to insights
+User clicked ndv button,LOW,NDV button clicked,User interacted with NDV
+User clicked ndv link,LOW,NDV link clicked,User navigated within NDV
+User clicked new chat button,LOW,New chat started,User started new chat
+User clicked on RAG callout,LOW,RAG callout clicked,User interacted with RAG
+User clicked on node minicard,LOW,Node minicard clicked,User clicked minicard
+User clicked on personalization card,LOW,Personalization card clicked,User interacted
+User clicked on personalized template callout,LOW,Template callout clicked,User clicked callout
+User clicked on resource center tile,LOW,Resource center tile clicked,User clicked tile
+User clicked on template from modal,LOW,Template from modal clicked,User selected template
+User clicked on template recommendation see more,LOW,Template reco see more clicked,User expanded
+User clicked on template recommendation tile,LOW,Template reco tile clicked,User clicked template
+User clicked on template recommendation video,LOW,Template reco video clicked,User clicked video
+User clicked on templates,LOW,Templates link clicked,User navigated to templates
+User clicked on templates repo from modal,LOW,Templates repo clicked,User navigated to repo
+User clicked on update button,LOW,Update button clicked,User clicked update CTA
+User clicked on what's new notification,LOW,Notification clicked,User clicked version notification
+User clicked on what's new section,LOW,What's new clicked,User viewed updates
+User clicked on workflow from insights table,LOW,Workflow clicked in insights,User navigated to workflow
+User clicked pin data icon,LOW,Pin data icon clicked,User interacted with pinning
+User clicked project variables tab,LOW,Variables tab clicked,User browsed project vars
+User clicked quick connect button,LOW,Quick connect clicked,User initiated OAuth quick connect
+User clicked review credentials,LOW,Review credentials link clicked,User clicked review after pull
+User clicked review variables,LOW,Review variables link clicked,User clicked review after pull
+User clicked solution card action,LOW,Undo/redo on solution,User interacted with solution
+User clicked to open community node update modal,LOW,Update modal opened,User viewed update options
+User clicked upgrade CTA,LOW,Upgrade CTA clicked,User clicked upgrade
+User clicks compare workflows,LOW,Compare workflows clicked,User viewed diff
+User closed Expression Editor,LOW,Expression editor closed,User closed expression editing
+User closed cred setup,LOW,Credential setup closed,User closed credential setup
+User closed focus panel,LOW,Focus panel closed,User closed focus panel
+User closed ndv edit state,LOW,Edit state exited,User exited edit mode
+User closed node modal,LOW,NDV closed,User closed node view
+User completed all setup steps,LOW,All setup steps done,User finished setup guide
+User completed setup step,LOW,Single setup step done,User completed step
+User copied MCP connection parameter,LOW,MCP param copied,User copied MCP config
+User copied nodes,LOW,Nodes copied,User copied nodes to clipboard
+User created AI templates starter collection,LOW,AI starter collection created,System created collection
+User created ready to run workflows,LOW,Starter workflows created,System created starters
+User deleted data table column,LOW,Data table column deleted,User modified table
+User deleted workflow note,LOW,Sticky note deleted,User removed note
+User dismissed AI templates starter collection callout,LOW,AI starter callout dismissed,User dismissed UI
+User dismissed mcp workflows dialog,LOW,MCP dialog dismissed,User closed MCP dialog
+User dismissed personalization tooltip,LOW,Tooltip dismissed,User dismissed
+User dismissed personalized template callout,LOW,Template callout dismissed,User dismissed callout
+User dismissed ready to run workflows callout,LOW,Starter callout dismissed,User dismissed UI
+User dismissed resource center tooltip,LOW,Resource center tooltip dismissed,User dismissed
+User dragged data for mapping,LOW,Data dragged for mapping,User performed data mapping
+User duplicated nodes,LOW,Nodes duplicated,User copied nodes
+User duplicated role,LOW,Role duplicated,User browsed roles
+User edited chat hub message,LOW,Chat hub message edited,User edited chat message
+User encountered an error,LOW,Error shown in NDV,User saw error message
+User entered nodes panel search term,LOW,Search in node panel,User searched for nodes
+User executed AI template,LOW,AI template executed,User ran AI template
+User executed command bar command,LOW,Command bar used,User ran command
+User executed node after assistant suggestion,LOW,Node executed after suggestion,User followed suggestion
+User executed ready to run AI workflow,LOW,Ready-to-run AI workflow executed,User ran AI starter
+User executed ready to run AI workflow successfully,LOW,AI starter succeeded,Execution completed
+User executed ready to run workflow,LOW,Ready-to-run workflow executed,User ran starter
+User executed test AI workflow,LOW,Test AI workflow run,User tested AI workflow
+User executed tutorial template,LOW,Tutorial template run,User ran tutorial
+User filtered by status in commit modal,LOW,Status filter in commit modal,User filtered by status
+User filtered executions with custom data,LOW,Execution filter used,User filtered executions
+User focused focus panel,LOW,Focus sidebar activated,User interacted with focus
+User gave feedback,LOW,Thumbs up/down on assistant,User rated assistant
+User hit redo,LOW,Redo pressed,User redid action
+User hit undo,LOW,Undo pressed,User undid action
+User hit undo in NDV,LOW,Undo in NDV,User undid NDV action
+User imported curl command,LOW,cURL import executed,User imported cURL command
+User imported workflow from empty state,LOW,Workflow imported from empty state,User imported template
+User initiated stop many executions,LOW,Bulk stop initiated,User started bulk stop
+User inserted tutorial template,LOW,Tutorial template inserted,User added tutorial template
+User inserted workflow note,LOW,Sticky note added,User added note
+User moved parameters pane,LOW,NDV pane resized,User adjusted UI layout
+User named version from history,LOW,Version named,User labeled a version
+User opened AI template workflow,LOW,AI template opened,User viewed AI template
+User opened Credential modal,LOW,Credential create/edit modal opened,"User viewed credential configuration UI — secrets are redacted server-side, not visible"
+User opened Expression Editor,LOW,Expression editor opened,User opened expression editing
+User opened assistant,LOW,Assistant panel opened,User opened assistant
+User opened cred setup,LOW,Credential setup modal opened,User opened template credential setup
+User opened focus panel,LOW,Focus panel opened,User opened focus panel
+User opened ndv edit state,LOW,Edit state entered,User entered edit mode
+User opened node modal,LOW,NDV opened,User browsed node configuration
+User opened nodes panel,LOW,Node creator panel opened,User browsed available nodes
+User opened ready to run AI workflow,LOW,Ready-to-run AI workflow opened,User opened AI starter
+User opened ready to run workflow,LOW,Ready-to-run workflow opened,User opened starter
+User opened sharing modal,LOW,Share dialog opened,User viewed sharing options
+User opened version in new tab,LOW,Version opened in new tab,User viewed version
+User opened workflow settings,LOW,Settings dialog opened,User viewed workflow settings
+User rated workflow generation,LOW,AI generation rated,User rated AI output
+User regenerated chat hub message,LOW,Chat hub message regenerated,User regenerated response
+User removed focused param,LOW,Focus param removed,User unfocused parameter
+User renamed data table,LOW,Data table renamed,User modified table name
+User renamed data table column,LOW,Data table column renamed,User modified table
+User responded to personalization questions,LOW,Personalization survey completed,User completed survey
+User responded value survey feedback,LOW,NPS feedback submitted,User provided feedback
+User responded value survey score,LOW,NPS score submitted,User rated experience
+User saved new workflow from template,LOW,Workflow saved from template,User created from template
+User searched workflows in commit modal,LOW,Commit modal search,User searched in commit
+User selected credential from node modal,LOW,Credential selected in dropdown,User browsed credential list
+User selected model or agent,LOW,Model/agent selected,User chose model
+User selected node in log view,LOW,Node selected in log,User browsed log entries
+User selected version,LOW,Version selected,User browsed versions
+User selected workflow from list,LOW,Workflow selected in MCP,User selected workflow for MCP
+User sent chat hub message,LOW,Chat hub message sent,User interacted with chat
+User set node operation or mode,LOW,Node operation changed,User configured node operation
+User skipped community plus,LOW,Community plus skipped,User dismissed enrollment
+User sorted insights table,LOW,Insights table sorted,User sorted analytics data
+User started nodes to sub-workflow extraction,LOW,Extraction started,User began extraction
+User submitted empty state builder prompt,LOW,Empty state prompt submitted,User used builder prompt
+User submitted workflow generation feedback,LOW,AI feedback submitted,User provided AI feedback
+User switched parameter mode,LOW,Fixed/expression mode switched,User changed parameter input mode
+User tidied up canvas,LOW,Auto-arrange canvas,User organized canvas
+User toggled log view,LOW,Log view toggled,User interacted with log panel
+User toggled log view sub pane,LOW,Log sub pane toggled,User interacted with log panel
+User toggled n8n reference option,LOW,Attribution toggled,User toggled n8n reference
+User toggled sidebar,LOW,Sidebar toggled,User toggled navigation sidebar
+User turned off fromAI override,LOW,fromAI disabled,User disabled AI override
+User turned on fromAI override,LOW,fromAI enabled,User enabled AI override
+User unpinned ndv data,LOW,Data unpinned,User removed pinned data
+User updated insights time range,LOW,Insights time range changed,User adjusted analytics view
+User viewed credential tab,LOW,Tab switched in credential editor,User navigated credential details — secrets remain redacted
+User viewed data mapping tooltip,LOW,Mapping tooltip shown,User hovered over mapping help
+User viewed node actions,LOW,Node actions viewed,User viewed node actions
+User viewed node category,LOW,Category opened in panel,User browsed node categories
+User viewed node settings,LOW,Settings tab viewed,User viewed node settings
+User viewed personalization modal,LOW,Personalization modal shown,User viewed modal
+User viewed personalization tooltip,LOW,Personalization tooltip shown,Tooltip displayed
+User viewed resource center tooltip,LOW,Resource center tooltip shown,Tooltip displayed
+User viewed template cell,LOW,Template card viewed,User browsed templates
+User viewed template detail,LOW,Template detail viewed,User viewed template
+User viewed tests tab,LOW,Tests tab viewed,User browsed tests
+User visited resource center,LOW,Resource center opened,User opened resource center
+User visited resource center section,LOW,Resource center section visited,User browsed section
+User visited template recommendation modal tab,LOW,Template reco tab visited,User browsed tab
+User visited template repo,LOW,Template repo visited,User visited templates
+User was recommended personalized templates,LOW,Templates recommended,System recommended templates
+Workflow builder journey,LOW,Builder journey tracking (various sub-events),User progressed through builder
+Workflow diff view closed,LOW,Diff modal closed,User closed diff view
+Workflow diff view opened,LOW,Diff modal opened,User viewed AI changes
+ai.focusedNodes.added,LOW,Focused node added to AI,User added node focus
+ai.focusedNodes.chatSent,LOW,Chat sent with focused nodes,User sent focused chat
+ai.focusedNodes.removed,LOW,Focused node removed from AI,User removed node focus
+user clicked cnr browse button,LOW,CNR browse button clicked,User browsed community nodes
+user clicked cnr docs link,LOW,CNR docs link clicked,User viewed docs
+user clicked cnr install button,LOW,CNR install button clicked,User initiated community node install
+user clicked ignore suggested action,LOW,Suggestion ignored,User dismissed suggestion
+user clicked ignore suggested actions for all workflows,LOW,All suggestions ignored,User dismissed all suggestions
+user clicked to browse the cnr package documentation,LOW,CNR package docs browsed,User viewed package docs
+user opened suggested actions checklist,LOW,Checklist opened,User viewed production checklist
+user viewed cnr settings page,LOW,CNR settings viewed,User viewed community nodes
+Instance FE emitted error,NONE,Frontend error,System error
+Instance FE emitted paired item error,NONE,Paired item error,System error
+Instance attempted to refresh license,NONE,License refresh,System license check
+Instance compacted workflow history,NONE,History compaction,System maintenance
+Instance failed to send transactional email to user,NONE,Email send failed,System email failure
+Instance first prod failure,NONE,First production failure,Milestone event
+Instance started,NONE,Server startup,System event — instance booted
+Ldap general sync finished,NONE,LDAP sync completed,System sync event
+Ldap login sync failed,NONE,LDAP sync failed,System error
+Manual exec errored,NONE,Frontend execution error,System error tracking
+Owner finished instance setup,NONE,Initial setup completed,System setup event
+Session started,NONE,Session/telemetry init,System event — session began
+Sso user instance role update,NONE,SSO role update,System provisioning
+Sso user project access update,NONE,SSO provisioning update,System provisioning
+Test run finished,NONE,Test run completed,System event
+User attempted to login,NONE,Login form submitted,Auth event
+User clicked invite link from email,NONE,Invite link clicked,System onboarding event
+User clicked password reset link from email,NONE,Password reset link clicked,System auth event
+User hit concurrency limit,NONE,Concurrency limit reached,System limit event
+User hit data table storage limit,NONE,Storage limit reached,System limit event
+User instance stopped,NONE,Instance shutdown,System event — instance stopped
+User is part of experiment,NONE,Experiment assignment,System A/B test assignment
+User login failed since ldap disabled,NONE,"Login failed, LDAP disabled",System auth event
+User opened workflow from onboarding template with ID,NONE,,
+User ran out of free AI credits,NONE,AI credits exhausted,System limit event
+User requested password reset while logged out,NONE,Password reset requested,System auth event
+User sent transactional email,NONE,Email sent successfully,System email event
+User shown value survey,NONE,NPS survey shown,System event
+User signed up,NONE,User completed signup,Account creation event
+Workflow execution count,NONE,Periodic aggregate,System batch of execution counts
+Workflow execution errored,NONE,Execution error (auto-tracked),System error tracking
+Workflow first data fetched,NONE,First data fetch,Milestone event
+Workflow first prod success,NONE,First production success,Milestone event
+pulse,NONE,6-hour heartbeat,System pulse — no user action
