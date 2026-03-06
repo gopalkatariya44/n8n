@@ -1,0 +1,379 @@
+Method,Path Pattern,Risk Category,What It Does,Response Contains
+GET,/rest/ldap/config,CRITICAL,Get LDAP configuration,"Decrypted `bindingAdminPassword` in plaintext, connectionUrl, baseDn, bindingAdminDn"
+PUT,/rest/ldap/config,CRITICAL,Update LDAP config,Decrypted `bindingAdminPassword` in response
+GET,/rest/credentials?includeData=true,CRITICAL,List credentials with data,"Decrypted credential data: non-password fields in plaintext (hostnames, usernames, client IDs, regions). Password fields replaced with blank sentinel. Requires `credential:update` scope."
+GET,/rest/credentials/:credentialId?includeData=true,CRITICAL,Get credential with data,Same as above for single credential. Non-password fields in plaintext.
+GET,/rest/executions/:id,CRITICAL,Get execution details,"Full node output data from workflow run — may contain API responses with tokens, PII, database results, any data processed by nodes"
+GET,/api/v1/executions/:id,CRITICAL,Get execution (Public API),Same — full node output data when `includeData=true`. Public API does NOT use redaction service
+GET,/api/v1/executions,CRITICAL,List executions (Public API),Bulk execution data when `includeData=true` — all node outputs across all executions
+GET,/rest/workflows/:workflowId/executions/last-successful,CRITICAL,Get last successful execution,Full execution data with all node outputs
+GET,/rest/variables/,CRITICAL,List all variables,"Variable values in plaintext — users commonly store secrets (API keys, passwords) as variables"
+GET,/rest/variables/:id,CRITICAL,Get variable,Variable value in plaintext
+GET,/api/v1/variables,CRITICAL,List variables (Public API),Variable values in plaintext
+GET,/rest/mfa/qr,CRITICAL,Get MFA setup data,TOTP `secret` and `recoveryCodes` in plaintext — allows attacker to clone user's 2FA
+POST,/rest/api-keys/,CRITICAL,Create API key,`rawApiKey` in plaintext — full API key shown once on creation
+GET,/rest/mcp/api-key,CRITICAL,Get/create MCP API key,API key in plaintext
+POST,/rest/mcp/api-key/rotate,CRITICAL,Rotate MCP API key,New API key in plaintext
+POST,/rest/ai/free-credits,CRITICAL,Claim free AI credits,Creates credential with API key
+POST,/rest/workflows/:workflowId/run,CRITICAL,Execute workflow manually,Execution results with node outputs — may contain any data the workflow processes
+GET,/rest/debug/multi-main-setup,CRITICAL,Debug multi-main info,"NO AUTH (skipAuth). Exposes instanceId, leaderKey, all active workflows, activation errors"
+POST,/rest/e2e/reset,CRITICAL,Reset entire database,"NO AUTH (skipAuth). Truncates all tables, recreates users. Only loaded when `N8N_E2E_TESTS=true`"
+POST,/rest/source-control/push-workfolder,CRITICAL,Push to git remote,Exports all workflows/credentials/variables to external git — data exfiltration vector
+POST,/rest/quick-connect/,CRITICAL,Quick-connect credential data,May return API keys/tokens from external provider
+GET,/rest/users/,HIGH,List all users,"User emails, names, roles, project relations, invite URLs for pending users"
+GET,/api/v1/users,HIGH,List users (Public API),"User emails, names, roles (cleaned but includes email)"
+GET,/api/v1/users/:id,HIGH,Get user (Public API),"User email, name, role"
+GET,/rest/users/:id/password-reset-link,HIGH,Generate password reset link,Usable password reset URL — allows account takeover
+POST,/rest/users/:id/invite-link,HIGH,Generate invite link,Invite URL with JWT
+DELETE,/rest/users/:id,HIGH,Delete a user,Irreversible user deletion
+PATCH,/rest/users/:id/role,HIGH,Change user role,Privilege escalation — can grant admin role
+POST,/rest/invitations/,HIGH,Send user invitations,"Creates new user accounts, sends invite emails"
+PUT,/rest/credentials/:credentialId/share,HIGH,Share credential,Grants credential access to other projects
+PUT,/rest/workflows/:workflowId/share,HIGH,Share workflow,"Grants workflow access to other projects, sends notifications"
+PUT,/rest/credentials/:credentialId/transfer,HIGH,Transfer credential,Changes credential ownership
+PUT,/rest/workflows/:workflowId/transfer,HIGH,Transfer workflow,Changes workflow ownership
+PUT,/api/v1/workflows/:id/transfer,HIGH,Transfer workflow (Public API),Changes workflow ownership
+PUT,/api/v1/credentials/:id/transfer,HIGH,Transfer credential (Public API),Changes credential ownership
+POST,/rest/license/activate,HIGH,Activate license,Returns `managementToken` JWT for license management
+POST,/rest/license/renew,HIGH,Renew license,Returns `managementToken` JWT
+GET,/rest/projects/:projectId,HIGH,Get project details,"Member emails, names, roles in relations array"
+POST,/rest/projects/:projectId/users,HIGH,Add users to project,Modifies project membership
+PATCH,/rest/projects/:projectId/users/:userId,HIGH,Change user role in project,Modifies project permissions
+DELETE,/rest/projects/:projectId/users/:userId,HIGH,Remove user from project,Removes access
+POST,/rest/owner/setup,HIGH,Set up instance owner,NO AUTH (skipAuth). Creates owner account on first setup
+GET,/rest/settings,HIGH,Get frontend settings (authed),"instanceId, posthog apiKey, telemetry writeKey, deployment type, license info, enterprise features"
+POST,/rest/settings/security/,HIGH,Update security settings,Modifies personal space publishing/sharing policies
+GET,/rest/sso/saml/config,HIGH,Get SAML config,"SAML preferences, entityID, returnUrl"
+POST,/rest/sso/saml/config,HIGH,Set SAML config,Modifies SAML SSO configuration
+POST,/rest/sso/saml/config/toggle,HIGH,Toggle SAML login,Enables/disables SAML authentication
+GET,/rest/sso/oidc/config,HIGH,Get OIDC config,OIDC config (clientSecret redacted)
+POST,/rest/sso/oidc/config,HIGH,Set OIDC config,Modifies OIDC SSO configuration
+GET,/rest/sso/provisioning/config,HIGH,Get SCIM provisioning config,Provisioning configuration
+PATCH,/rest/sso/provisioning/config,HIGH,Update provisioning config,Modifies SCIM provisioning
+POST,/rest/mfa/enforce-mfa,HIGH,Enforce MFA for all users,Forces all users to enable MFA
+GET,/rest/api-keys/,HIGH,List API keys,"API key metadata (keys redacted, but IDs visible)"
+DELETE,/rest/api-keys/:id,HIGH,Delete API key,Revokes API key
+GET,/rest/external-secrets/providers,HIGH,List external secret providers,"Provider metadata, connection state"
+GET,/rest/external-secrets/providers/:provider,HIGH,Get external secret provider,"Provider details, properties"
+POST,/rest/external-secrets/providers/:provider,HIGH,Set provider settings,Configures secret provider connection
+GET,/rest/eventbus/destination,HIGH,List log streaming destinations,Destination configs (may include connection details)
+POST,/rest/eventbus/destination,HIGH,Create log streaming destination,Creates external logging destination
+DELETE,/rest/eventbus/destination,HIGH,Delete log streaming destination,Removes audit trail
+POST,/rest/source-control/preferences,HIGH,Set source control preferences,"Configures git integration (repo URL, keys)"
+POST,/rest/source-control/pull-workfolder,HIGH,Pull from git remote,Imports workflows/credentials from external git
+GET,/rest/source-control/reset-workfolder,HIGH,Reset work folder,Resets local state to remote git
+PATCH,/rest/roles/:slug,HIGH,Update custom role,Modifies role permissions
+DELETE,/rest/roles/:slug,HIGH,Delete custom role,Removes role
+POST,/rest/roles/,HIGH,Create custom role,Creates new role with permissions
+PATCH,/rest/mcp/settings,HIGH,Toggle MCP access,Enables/disables MCP server
+DELETE,/rest/mcp/oauth-clients/:clientId,HIGH,Delete MCP OAuth client,Revokes OAuth client
+GET,/rest/credentials/,MEDIUM,List credentials (no includeData),"Credential metadata: id, name, type, timestamps. No secrets"
+GET,/rest/credentials/:credentialId,MEDIUM,Get credential (no includeData),Credential metadata + scopes. No secrets
+POST,/rest/credentials/,MEDIUM,Create credential,Created credential entity (data encrypted in DB)
+PATCH,/rest/credentials/:credentialId,MEDIUM,Update credential,Updated metadata (data/shared stripped from response)
+DELETE,/rest/credentials/:credentialId,MEDIUM,Delete credential,`true`
+POST,/rest/credentials/test,MEDIUM,Test credential connection,Pass/fail result only
+POST,/api/v1/credentials,MEDIUM,Create credential (Public API),Sanitized (no data field)
+PATCH,/api/v1/credentials/:id,MEDIUM,Update credential (Public API),Sanitized (no data field)
+DELETE,/api/v1/credentials/:id,MEDIUM,Delete credential (Public API),Sanitized (no data field)
+GET,/rest/workflows/,MEDIUM,List all workflows,"Workflow metadata, nodes (with credential refs, not secrets), connections"
+GET,/rest/workflows/:workflowId,MEDIUM,Get workflow,"Full workflow entity, nodes, connections, used credentials metadata"
+POST,/rest/workflows/,MEDIUM,Create workflow,Created workflow entity
+PATCH,/rest/workflows/:workflowId,MEDIUM,Update workflow,Updated workflow entity
+DELETE,/rest/workflows/:workflowId,MEDIUM,Delete workflow,`true`
+POST,/rest/workflows/:workflowId/activate,MEDIUM,Activate workflow,Workflow entity (now active)
+POST,/rest/workflows/:workflowId/deactivate,MEDIUM,Deactivate workflow,Workflow entity (now inactive)
+POST,/rest/workflows/:workflowId/archive,MEDIUM,Archive workflow,Workflow entity
+POST,/rest/workflows/:workflowId/unarchive,MEDIUM,Unarchive workflow,Workflow entity
+GET,/rest/workflows/from-url,MEDIUM,Import workflow from URL,"Fetched workflow JSON (nodes, connections)"
+POST,/rest/workflows/with-node-types,MEDIUM,Find workflows by node types (admin),Matching workflows with count
+GET,/api/v1/workflows,MEDIUM,List all workflows (Public API),"Bulk: full workflow definitions, nodes, connections, settings, staticData, pinData"
+GET,/api/v1/workflows/:id,MEDIUM,Get workflow (Public API),Full workflow entity
+GET,/api/v1/workflows/:id/:versionId,MEDIUM,Get workflow version (Public API),Historical workflow version
+PUT,/api/v1/workflows/:id,MEDIUM,Update workflow (Public API),Updated workflow
+DELETE,/api/v1/workflows/:id,MEDIUM,Delete workflow (Public API),Deleted workflow
+POST,/api/v1/workflows/:id/activate,MEDIUM,Activate workflow (Public API),Updated workflow
+POST,/api/v1/workflows/:id/deactivate,MEDIUM,Deactivate workflow (Public API),Updated workflow
+GET,/rest/executions/,MEDIUM,List executions,"Execution summaries (no full data): id, status, timestamps, workflowId"
+POST,/rest/executions/:id/stop,MEDIUM,Stop execution,Stop result
+POST,/rest/executions/stopMany,MEDIUM,Stop multiple executions,`{ stopped: count }`
+POST,/rest/executions/:id/retry,MEDIUM,Retry execution,Execution result
+POST,/rest/executions/delete,MEDIUM,Delete executions (bulk),Deletion result
+PATCH,/rest/executions/:id,MEDIUM,Update execution annotations,Updated execution
+DELETE,/api/v1/executions/:id,MEDIUM,Delete execution (Public API),Deleted execution
+POST,/api/v1/executions/:id/retry,MEDIUM,Retry execution (Public API),Retry result
+POST,/api/v1/executions/:id/stop,MEDIUM,Stop execution (Public API),Stop result
+POST,/api/v1/executions/stop,MEDIUM,Stop many executions (Public API),`{ stopped: count }`
+POST,/rest/variables/,MEDIUM,Create variable,Created variable (licensed)
+PATCH,/rest/variables/:id,MEDIUM,Update variable,Updated variable (licensed)
+DELETE,/rest/variables/:id,MEDIUM,Delete variable,`true` (licensed)
+POST,/api/v1/variables,MEDIUM,Create variable (Public API),201
+PATCH,/api/v1/variables/:id,MEDIUM,Update variable (Public API),204
+DELETE,/api/v1/variables/:id,MEDIUM,Delete variable (Public API),204
+GET,/rest/projects/,MEDIUM,List projects,Array of project objects
+POST,/rest/projects/,MEDIUM,Create project,Created project with role and scopes
+PATCH,/rest/projects/:projectId,MEDIUM,Update project,void
+DELETE,/rest/projects/:projectId,MEDIUM,Delete project,void
+PATCH,/rest/me/,MEDIUM,Update own profile,PublicUser (updated)
+PATCH,/rest/me/password,MEDIUM,Change own password,`{ success: true }`
+PATCH,/rest/me/settings,MEDIUM,Update own settings,Settings object
+PATCH,/rest/users/:id/settings,MEDIUM,Update user settings,Settings object
+POST,/rest/mfa/enable,MEDIUM,Enable MFA,void (sets cookie)
+POST,/rest/mfa/disable,MEDIUM,Disable MFA,void (sets cookie)
+PATCH,/rest/api-keys/:id,MEDIUM,Update API key,`{ success: true }`
+POST,/rest/community-packages/,MEDIUM,Install community package,InstalledPackages entity
+DELETE,/rest/community-packages/,MEDIUM,Uninstall community package,void
+PATCH,/rest/community-packages/,MEDIUM,Update community package,Updated package
+GET,/rest/workflow-history/workflow/:workflowId,MEDIUM,List workflow versions,Version metadata list
+GET,/rest/workflow-history/workflow/:workflowId/version/:versionId,MEDIUM,Get workflow version,Full historical workflow snapshot
+POST,/rest/workflow-history/workflow/:workflowId/versions,MEDIUM,Get multiple versions,Version objects
+PATCH,/rest/workflow-history/workflow/:workflowId/versions/:versionId,MEDIUM,Update version metadata,Updated version
+POST,/rest/source-control/disconnect,MEDIUM,Disconnect source control,Disconnect result
+POST,/rest/source-control/generate-key-pair,MEDIUM,Generate SSH key pair,Preferences with new publicKey
+PATCH,/rest/source-control/preferences,MEDIUM,Update source control prefs,Updated preferences
+POST,/api/v1/source-control/pull,MEDIUM,Pull from source control (Public API),Import result
+POST,/rest/projects/:projectId/data-tables/,MEDIUM,Create data table,Data table entity
+PATCH,/rest/projects/:projectId/data-tables/:dataTableId,MEDIUM,Update data table,Updated data table
+DELETE,/rest/projects/:projectId/data-tables/:dataTableId,MEDIUM,Delete data table,Result
+GET,/rest/projects/:projectId/data-tables/:dataTableId/rows,MEDIUM,Get data table rows,Paginated row data
+GET,/rest/projects/:projectId/data-tables/:dataTableId/download-csv,MEDIUM,Download data table as CSV,CSV content
+POST,/rest/projects/:projectId/data-tables/:dataTableId/insert,MEDIUM,Insert rows,Inserted rows
+POST,/rest/projects/:projectId/data-tables/:dataTableId/upsert,MEDIUM,Upsert rows,Upsert result
+PATCH,/rest/projects/:projectId/data-tables/:dataTableId/rows,MEDIUM,Update rows,Update result
+DELETE,/rest/projects/:projectId/data-tables/:dataTableId/rows,MEDIUM,Delete rows,Delete result
+POST,/rest/projects/:projectId/data-tables/:dataTableId/columns,MEDIUM,Add column,Updated columns
+DELETE,/rest/projects/:projectId/data-tables/:dataTableId/columns/:columnId,MEDIUM,Delete column,Result
+PATCH,/rest/projects/:projectId/data-tables/:dataTableId/columns/:columnId/move,MEDIUM,Reorder column,Updated columns
+PATCH,/rest/projects/:projectId/data-tables/:dataTableId/columns/:columnId/rename,MEDIUM,Rename column,Updated columns
+POST,/api/v1/data-tables,MEDIUM,Create data table (Public API),Data table (201)
+PATCH,/api/v1/data-tables/:dataTableId,MEDIUM,Update data table (Public API),Data table
+DELETE,/api/v1/data-tables/:dataTableId,MEDIUM,Delete data table (Public API),204
+POST,/api/v1/data-tables/:dataTableId/rows,MEDIUM,Insert rows (Public API),Rows
+PATCH,/api/v1/data-tables/:dataTableId/rows,MEDIUM,Update rows (Public API),Result
+POST,/api/v1/data-tables/:dataTableId/rows/upsert,MEDIUM,Upsert rows (Public API),Result
+DELETE,/api/v1/data-tables/:dataTableId/rows,MEDIUM,Delete rows (Public API),Result
+POST,/rest/projects/:projectId/folders/,MEDIUM,Create folder,Folder entity
+PATCH,/rest/projects/:projectId/folders/:folderId,MEDIUM,Update folder,void
+DELETE,/rest/projects/:projectId/folders/:folderId,MEDIUM,Delete folder,void
+PUT,/rest/projects/:projectId/folders/:folderId/transfer,MEDIUM,Transfer folder,Transfer result
+POST,/rest/tags/,MEDIUM,Create tag,Tag entity
+PATCH,/rest/tags/:id,MEDIUM,Update tag,Tag entity
+DELETE,/rest/tags/:id,MEDIUM,Delete tag,`true`
+POST,/api/v1/tags,MEDIUM,Create tag (Public API),Tag (201)
+PATCH,/api/v1/tags/:id,MEDIUM,Update tag (Public API),Tag
+DELETE,/api/v1/tags/:id,MEDIUM,Delete tag (Public API),Tag
+POST,/rest/annotation-tags/,MEDIUM,Create annotation tag,Tag entity
+PATCH,/rest/annotation-tags/:id,MEDIUM,Update annotation tag,Tag entity
+DELETE,/rest/annotation-tags/:id,MEDIUM,Delete annotation tag,`true`
+PUT,/api/v1/workflows/:id/tags,MEDIUM,Update workflow tags (Public API),Tags array
+PUT,/api/v1/executions/:id/tags,MEDIUM,Update execution tags (Public API),Tags array
+POST,/api/v1/users,MEDIUM,Create/invite user (Public API),Invited user
+DELETE,/api/v1/users/:id,MEDIUM,Delete user (Public API),204
+PATCH,/api/v1/users/:id/role,MEDIUM,Change user role (Public API),204
+POST,/rest/external-secrets/providers/:provider/connect,MEDIUM,Toggle provider connection,`{}`
+POST,/rest/external-secrets/providers/:provider/update,MEDIUM,Sync secrets from provider,`{ updated: boolean }`
+POST,/rest/secret-providers/connections/,MEDIUM,Create secret provider connection,SecretProviderConnection
+PATCH,/rest/secret-providers/connections/:providerKey,MEDIUM,Update connection,SecretProviderConnection
+DELETE,/rest/secret-providers/connections/:providerKey,MEDIUM,Delete connection,204
+POST,/rest/secret-providers/projects/:projectId/connections,MEDIUM,Create project secret connection,SecretProviderConnection
+PATCH,/rest/secret-providers/projects/:projectId/connections/:providerKey,MEDIUM,Update project connection,SecretProviderConnection
+DELETE,/rest/secret-providers/projects/:projectId/connections/:providerKey,MEDIUM,Delete project connection,204
+POST,/rest/workflows/:workflowId/test-runs/new,MEDIUM,Start test run,`{ success: true }` (202)
+DELETE,/rest/workflows/:workflowId/test-runs/:id,MEDIUM,Delete test run,`{ success: true }`
+POST,/rest/workflows/:workflowId/test-runs/:id/cancel,MEDIUM,Cancel test run,`{ success: true }` (202)
+PATCH,/rest/mcp/workflows/:workflowId/toggle-access,MEDIUM,Toggle MCP workflow access,"`{ id, settings, versionId }`"
+POST,/rest/ai/build,MEDIUM,AI workflow builder (streaming),JSON-lines stream of AI chunks
+POST,/rest/ai/chat,MEDIUM,AI chat assistance (streaming),JSON-lines stream
+POST,/rest/ai/chat/apply-suggestion,MEDIUM,Apply AI suggestion,ApplySuggestionResponse
+POST,/rest/ai/usage-settings,MEDIUM,Update AI usage settings,void
+POST,/rest/chat/conversations/send,MEDIUM,Send chat message,`{ status: 'streaming' }`
+POST,/rest/chat/conversations/:sessionId/messages/:messageId/edit,MEDIUM,Edit chat message,`{ status: 'streaming' }`
+POST,/rest/chat/conversations/:sessionId/messages/:messageId/regenerate,MEDIUM,Regenerate AI response,`{ status: 'streaming' }`
+PATCH,/rest/chat/conversations/:sessionId,MEDIUM,Update conversation,ChatHubConversationResponse
+DELETE,/rest/chat/conversations/:sessionId,MEDIUM,Delete conversation,204
+POST,/rest/chat/tools,MEDIUM,Create chat tool,Tool DTO
+PATCH,/rest/chat/tools/:toolId,MEDIUM,Update chat tool,Tool DTO
+DELETE,/rest/chat/tools/:toolId,MEDIUM,Delete chat tool,204
+POST,/rest/chat/agents,MEDIUM,Create chat agent,Agent DTO
+POST,/rest/chat/agents/:agentId,MEDIUM,Update chat agent,Agent DTO
+DELETE,/rest/chat/agents/:agentId,MEDIUM,Delete chat agent,204
+POST,/rest/chat/settings,MEDIUM,Update chat provider settings,Provider settings
+POST,/rest/data-tables/uploads/,MEDIUM,Upload CSV,"`{ originalName, id, rowCount, columnCount, columns }`"
+POST,/rest/credential-resolvers/,MEDIUM,Create credential resolver,CredentialResolver
+PATCH,/rest/credential-resolvers/:id,MEDIUM,Update credential resolver,CredentialResolver
+DELETE,/rest/credential-resolvers/:id,MEDIUM,Delete credential resolver,`{ success: true }`
+POST,/rest/breaking-changes/report/refresh,MEDIUM,Refresh breaking changes cache,Report result
+POST,/api/v1/audit,MEDIUM,Generate security audit,Audit results
+GET,/rest/credentials/for-workflow,LOW,Credentials usable in workflow,"`{ id, name, type, scopes }` — no secrets"
+GET,/rest/credentials/new,LOW,Generate unique credential name,`{ name }`
+GET,/api/v1/credentials,LOW,List credentials (Public API),"id, name, type, timestamps — no data/secrets"
+GET,/api/v1/credentials/schema/:credentialTypeName,LOW,Get credential type schema,"JSON Schema (field definitions, not values)"
+GET,/rest/workflows/new,LOW,Generate unique workflow name,`{ name }`
+GET,/rest/workflows/:workflowId/exists,LOW,Check if workflow exists,`{ exists: boolean }`
+GET,/rest/workflows/:workflowId/collaboration/write-lock,LOW,Get write lock info,Write lock object
+GET,/rest/active-workflows/,LOW,List active workflow IDs,Array of ID strings
+GET,/rest/active-workflows/error/:id,LOW,Get activation error,Error details or null
+GET,/rest/workflow-stats/:id/counts/,LOW,Get execution counts,"`{ productionSuccess, productionError, manualSuccess, manualError }`"
+GET,/rest/workflow-stats/:id/times/,LOW,Get execution times,Timestamps
+GET,/rest/workflow-stats/:id/data-loaded/,LOW,Check data loaded,`{ dataLoaded: boolean }`
+GET,/api/v1/workflows/:id/tags,LOW,Get workflow tags (Public API),Tag array
+GET,/api/v1/executions/:id/tags,LOW,Get execution tags (Public API),Tag array
+GET,/rest/tags/,LOW,List tags,Tag array with optional usage count
+GET,/api/v1/tags,LOW,List tags (Public API),Tag array with cursor
+GET,/api/v1/tags/:id,LOW,Get tag (Public API),Tag entity
+GET,/rest/annotation-tags/,LOW,List annotation tags,Tag array
+POST,/rest/node-types/,LOW,Get node type descriptions,INodeTypeDescription array
+POST,/rest/node-types/by-identifier,LOW,Get node types by identifier,INodeTypeDescription array
+POST,/rest/dynamic-node-parameters/options,LOW,Get dynamic node parameter options,INodePropertyOptions array
+POST,/rest/dynamic-node-parameters/resource-locator-results,LOW,Resource locator search,Resource locator results
+POST,/rest/dynamic-node-parameters/resource-mapper-fields,LOW,Resource mapper fields,Resource mapper fields
+POST,/rest/dynamic-node-parameters/local-resource-mapper-fields,LOW,Local resource mapper fields,Local resource fields
+POST,/rest/dynamic-node-parameters/action-result,LOW,Node action handler,NodeParameterValueType
+GET,/rest/community-packages/,LOW,List installed packages,Package list with versions
+GET,/rest/community-node-types/:name,LOW,Get community node type,CommunityNodeType or null
+GET,/rest/community-node-types/,LOW,List community node types,CommunityNodeType array
+GET,/rest/projects/count,LOW,Get project counts,Count data
+GET,/rest/projects/my-projects,LOW,Get user's projects,Projects with role and scopes
+GET,/rest/projects/personal,LOW,Get personal project,Project with scopes
+GET,/rest/projects/:projectId/data-tables/,LOW,List data tables,"`{ data, count }`"
+GET,/rest/projects/:projectId/data-tables/:dataTableId/columns,LOW,Get columns,Column definitions
+GET,/api/v1/data-tables,LOW,List data tables (Public API),"`{ data, nextCursor }`"
+GET,/api/v1/data-tables/:dataTableId,LOW,Get data table (Public API),Data table with columns
+GET,/api/v1/data-tables/:dataTableId/rows,LOW,Get rows (Public API),"`{ data, nextCursor }`"
+GET,/rest/data-tables-global/,LOW,List all data tables globally,"`{ data, count }`"
+GET,/rest/data-tables-global/limits,LOW,Get data tables limits,Size/limit info
+GET,/rest/projects/:projectId/folders/:folderId/tree,LOW,Get folder tree,Tree array
+GET,/rest/projects/:projectId/folders/:folderId/credentials,LOW,Get folder credentials,Credential references
+GET,/rest/projects/:projectId/folders/,LOW,List folders,"`{ count, data }`"
+GET,/rest/projects/:projectId/folders/:folderId/content,LOW,Get folder content,"`{ totalSubFolders, totalWorkflows }`"
+GET,/rest/roles/,LOW,List roles,Role definitions grouped by type
+GET,/rest/roles/:slug,LOW,Get role,Role DTO
+GET,/rest/roles/:slug/assignments,LOW,Get role assignments,Assignment data
+GET,/rest/roles/:slug/assignments/:projectId/members,LOW,Get project members by role,Member list
+GET,/rest/license/,LOW,Get license data,"Plan name, usage counts"
+GET,/rest/settings/security/,LOW,Get security settings,Personal space publishing/sharing counts
+GET,/rest/source-control/preferences,LOW,Get source control prefs,"Preferences (privateKey redacted), repositoryUrl, branchName"
+GET,/rest/source-control/get-branches,LOW,List git branches,Branch name array
+GET,/rest/source-control/get-status,LOW,Get file status,File status array
+GET,/rest/source-control/status,LOW,Alias for get-status,Same
+GET,/rest/source-control/remote-content/:type/:id,LOW,Get remote file content,"`{ content, type }`"
+GET,/rest/external-secrets/secrets,LOW,List secret names,Secret names only (not values)
+POST,/rest/external-secrets/providers/:provider/test,LOW,Test secret provider,`{ success: boolean }`
+GET,/rest/secret-providers/types/,LOW,List provider types,SecretProviderTypeResponse array
+GET,/rest/secret-providers/types/:type,LOW,Get provider type schema,SecretProviderTypeResponse
+GET,/rest/secret-providers/connections/,LOW,List connections,SecretProviderConnectionListItem array
+GET,/rest/secret-providers/connections/:providerKey,LOW,Get connection,SecretProviderConnection
+POST,/rest/secret-providers/connections/:providerKey/test,LOW,Test connection,TestSecretProviderConnectionResponse
+POST,/rest/secret-providers/connections/:providerKey/reload,LOW,Reload secrets,ReloadSecretProviderConnectionResponse
+GET,/rest/secret-providers/projects/:projectId/connections,LOW,List project connections,SecretProviderConnectionListItem array
+GET,/rest/secret-providers/projects/:projectId/connections/:providerKey,LOW,Get project connection,SecretProviderConnection
+POST,/rest/secret-providers/projects/:projectId/connections/:providerKey/test,LOW,Test project connection,TestSecretProviderConnectionResponse
+POST,/rest/secret-providers/projects/:projectId/reload,LOW,Reload project secrets,ReloadSecretProviderConnectionResponse
+GET,/rest/secret-providers/completions/secrets/global,LOW,Global secret name completions,SecretCompletionsResponse
+GET,/rest/secret-providers/completions/secrets/project/:projectId,LOW,Project secret name completions,SecretCompletionsResponse
+GET,/rest/workflows/:workflowId/test-runs,LOW,List test runs,Paginated test run summaries
+GET,/rest/workflows/:workflowId/test-runs/:id,LOW,Get test run,Test run summary
+GET,/rest/workflows/:workflowId/test-runs/:id/test-cases,LOW,Get test cases,Test case executions
+GET,/rest/insights/summary,LOW,Get insights summary,InsightsSummary
+GET,/rest/insights/by-workflow,LOW,Insights per workflow,InsightsByWorkflow
+GET,/rest/insights/by-time,LOW,Insights over time,InsightsByTime array
+GET,/rest/insights/by-time/time-saved,LOW,Time-saved insights,RestrictedInsightsByTime array
+GET,/rest/eventbus/eventnames,LOW,List event names,Event name strings
+GET,/rest/eventbus/testmessage,LOW,Send test log message,boolean
+GET,/rest/mcp/workflows,LOW,List MCP-eligible workflows,"`{ count, data }`"
+GET,/rest/mcp/oauth-clients/,LOW,List MCP OAuth clients,ListOAuthClientsResponseDto
+GET,/rest/credential-resolvers/,LOW,List credential resolvers,CredentialResolver array
+GET,/rest/credential-resolvers/types,LOW,List resolver types,CredentialResolverType array
+GET,/rest/credential-resolvers/:id,LOW,Get credential resolver,CredentialResolver
+GET,/rest/ldap/sync,LOW,Get LDAP sync history,Sync history records
+POST,/rest/ldap/test-connection,LOW,Test LDAP connection,void or error
+POST,/rest/ldap/sync,LOW,Trigger LDAP sync,void
+POST,/rest/ai/ask-ai,LOW,Ask AI about node/expression,AskAiResponsePayload
+GET,/rest/ai/sessions,LOW,Get AI builder sessions,Session array
+GET,/rest/ai/build/credits,LOW,Get AI credit balance,Credits response
+POST,/rest/ai/build/truncate-messages,LOW,Truncate AI messages,`{ success: boolean }`
+POST,/rest/ai/build/clear-session,LOW,Clear AI session,`{ success: boolean }`
+GET,/rest/chat/conversations,LOW,List conversations,ChatHubConversationsResponse
+GET,/rest/chat/conversations/:sessionId,LOW,Get conversation,ChatHubConversationResponse
+GET,/rest/chat/conversations/:sessionId/messages/:messageId/attachments/:index,LOW,Get attachment,Binary file stream
+POST,/rest/chat/conversations/:sessionId/messages/:messageId/stop,LOW,Stop AI generation,204
+POST,/rest/chat/conversations/:sessionId/reconnect,LOW,Reconnect chat stream,ChatReconnectResponse
+POST,/rest/chat/models,LOW,Get available chat models,ChatModelsResponse
+GET,/rest/chat/tools,LOW,List chat tools,Tool DTO array
+GET,/rest/chat/agents,LOW,List chat agents,Agent DTO array
+GET,/rest/chat/agents/:agentId,LOW,Get chat agent,Agent DTO
+GET,/rest/chat/settings,LOW,Get chat settings,`{ providers }`
+GET,/rest/chat/settings/:provider,LOW,Get provider settings,`{ settings }`
+GET,/rest/breaking-changes/report,LOW,Get breaking changes report,Report result
+GET,/rest/breaking-changes/report/:ruleId,LOW,Get specific rule results,Rule result
+POST,/rest/webhooks/find,LOW,Find webhook by method+path,Webhook entity or null
+GET,/rest/module-settings/,LOW,Get module settings,Module settings
+GET,/rest/dynamic-templates/,LOW,Fetch dynamic templates,`{ templates }`
+GET,/rest/cta/become-creator,LOW,Check become-creator CTA,Boolean
+GET,/rest/binary-data/,LOW,Stream binary data,Binary file stream
+GET,/rest/api-keys/scopes,LOW,Get available API key scopes,Scope string array
+POST,/rest/mfa/can-enable,LOW,Check if MFA can be enabled,void
+POST,/rest/mfa/verify,LOW,Verify MFA code,void
+GET,/rest/orchestration/worker/status,LOW,Request worker status,Worker status
+GET,/healthz,NONE,Health check,`{ status: 'ok' }`
+GET,/healthz/readiness,NONE,Readiness check,`{ status: 'ok' }` or 503
+GET,/rest/settings` (unauthed),NONE,Public frontend settings,"Locale, auth method, SSO status, setup needed"
+POST,/rest/login,NONE,Log in,PublicUser (no password/mfaSecret)
+GET,/rest/login,NONE,Check session,PublicUser or empty
+POST,/rest/logout,NONE,Log out,`{ loggedOut: true }`
+GET,/rest/resolve-signup-token,NONE,Validate invite token,"`{ inviter: { firstName, lastName } }`"
+POST,/rest/invitations/accept,NONE,Accept invitation,PublicUser
+POST,/rest/invitations/:id/accept,NONE,Accept invitation (legacy),PublicUser
+POST,/rest/forgot-password,NONE,Request password reset,void (no email disclosure)
+GET,/rest/resolve-password-token,NONE,Validate reset token,void
+POST,/rest/change-password,NONE,Change password via token,void
+POST,/rest/owner/setup,NONE,Instance owner setup,PublicUser (first-time only)
+POST,/rest/owner/dismiss-banner,NONE,Dismiss banner,void
+POST,/rest/me/survey,NONE,Save survey answers,`{ success: true }`
+PATCH,/rest/user-settings/nps-survey,NONE,Update NPS survey,void
+GET,/rest/events/session-started,NONE,Record session start,void
+GET,/rest/credential-translation,NONE,Credential i18n,Translation JSON
+GET,/rest/node-translation-headers,NONE,Node i18n headers,Headers JSON
+GET,/rest/third-party-licenses/,NONE,Third-party licenses,License markdown text
+POST,/rest/license/enterprise/request_trial,NONE,Request trial,void
+POST,/rest/license/enterprise/community-registered,NONE,Register community,Registration result
+GET,/rest/sso/saml/metadata,NONE,SAML SP metadata (public),XML metadata
+GET,/rest/sso/saml/acs,NONE,SAML ACS (GET),Redirect/HTML
+POST,/rest/sso/saml/acs,NONE,SAML ACS (POST),Redirect/HTML
+GET,/rest/sso/saml/initsso,NONE,Initiate SAML SSO,Redirect
+POST,/rest/sso/saml/config/test,NONE,Test SAML config,Redirect URL
+GET,/rest/sso/oidc/login,NONE,OIDC login redirect,HTTP redirect
+GET,/rest/sso/oidc/callback,NONE,OIDC callback,"Sets cookie, redirects"
+GET,/rest/oauth1-credential/auth,NONE,OAuth1 auth URL,Authorization URL
+GET,/rest/oauth1-credential/callback,NONE,OAuth1 callback,HTML template
+GET,/rest/oauth2-credential/auth,NONE,OAuth2 auth URL,Authorization URL
+GET,/rest/oauth2-credential/callback,NONE,OAuth2 callback,HTML template
+POST,/rest/telemetry/proxy/:version/track,NONE,Telemetry proxy (no auth),Proxied response
+POST,/rest/telemetry/proxy/:version/identify,NONE,Telemetry proxy (no auth),Proxied response
+POST,/rest/telemetry/proxy/:version/page,NONE,Telemetry proxy (no auth),Proxied response
+GET,/rest/telemetry/rudderstack/sourceConfig,NONE,RudderStack config (no auth),Config JSON
+ALL,/rest/ph/*,NONE,PostHog proxy (no auth),Proxied response
+GET,/rest/binary-data/signed,NONE,"Signed binary data (no auth, JWT required)",Binary stream
+GET,/.well-known/oauth-authorization-server,NONE,OAuth metadata (no auth),OAuth metadata JSON
+GET,/.well-known/oauth-protected-resource/mcp-server/http,NONE,Protected resource metadata,Resource metadata
+ALL,/mcp-oauth/register,NONE,MCP OAuth registration,Client registration
+ALL,/mcp-oauth/authorize,NONE,MCP OAuth authorization,Auth response
+ALL,/mcp-oauth/token,NONE,MCP OAuth token exchange,Token response
+ALL,/mcp-oauth/revoke,NONE,MCP OAuth revocation,Revocation response
+HEAD,/mcp-server/http,NONE,MCP auth discovery,401 with WWW-Authenticate
+POST,/mcp-server/http,NONE,MCP JSON-RPC (OAuth auth),JSON-RPC responses
+GET,/rest/consent/details,NONE,OAuth consent details,"`{ clientName, clientId }`"
+POST,/rest/consent/approve,NONE,OAuth consent approval,"`{ status, redirectUrl }`"
+OPTIONS,/rest/credentials/:id/revoke,NONE,CORS preflight,Headers
+DELETE,/rest/credentials/:id/revoke,NONE,Revoke dynamic credential (external auth),204
+OPTIONS,/rest/credentials/:id/authorize,NONE,CORS preflight,Headers
+POST,/rest/credentials/:id/authorize,NONE,Authorize dynamic credential (external auth),Auth URL
+OPTIONS,/rest/workflows/:workflowId/execution-status,NONE,CORS preflight,Headers
+GET,/rest/workflows/:workflowId/execution-status,NONE,Workflow execution readiness (external auth),Status + credential metadata
+PATCH,/rest/e2e/feature,NONE,"Toggle E2E feature (no auth, E2E only)",void
+PATCH,/rest/e2e/quota,NONE,"Set E2E quotas (no auth, E2E only)",void
+PATCH,/rest/e2e/queue-mode,NONE,"Toggle E2E queue (no auth, E2E only)",Result
+GET,/rest/e2e/env-feature-flags,NONE,"Get E2E flags (no auth, E2E only)",Flags
+PATCH,/rest/e2e/env-feature-flags,NONE,"Set E2E flags (no auth, E2E only)",Result
+POST,/rest/e2e/push,NONE,"E2E push (no auth, E2E only)",void
+POST,/rest/e2e/gc,NONE,"E2E garbage collection (no auth, E2E only)",Result
